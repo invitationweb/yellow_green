@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Undangan Pernikahan Fara & Juan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;600;800&family=Cinzel+Decorative:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
@@ -15,6 +15,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // Global Firebase configuration provided by the environment
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -22,7 +23,13 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'wedding-emerald-premium-yellow';
 
         const initAuth = async () => {
-            try { await signInAnonymously(auth); } catch (error) { console.error("Auth error", error); }
+            try { 
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth); 
+                }
+            } catch (error) { console.error("Auth error", error); }
         };
 
         initAuth();
@@ -59,7 +66,7 @@
                 docs.forEach((data) => {
                     const div = document.createElement('div');
                     div.className = 'bg-[#117a6b]/40 border-l-2 border-[#FFFF00] p-3 rounded-r-lg mb-3 backdrop-blur-md';
-                    div.innerHTML = `<h4 class="text-[#FFFF00] font-bold text-[9px] tracking-wider uppercase">${data.name || 'Anonim'}</h4><p class="text-white text-[10px] mt-1 italic">"${data.message || ''}"</p>`;
+                    div.innerHTML = `<h4 class="text-[#FFFF00] font-bold text-[10px] tracking-wider uppercase">${data.name || 'Anonim'}</h4><p class="text-white text-[11px] mt-1 italic leading-relaxed">"${data.message || ''}"</p>`;
                     list.appendChild(div);
                 });
             }, (err) => console.error(err));
@@ -107,19 +114,42 @@
             --yellow-flat: #FFFF00; 
         }
 
-        * { scroll-behavior: smooth; }
-        body { background-color: var(--emerald-bg); color: #ffffff; font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        * { 
+            scroll-behavior: smooth; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            background-color: var(--emerald-bg); 
+            color: #ffffff; 
+            font-family: 'Montserrat', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden;
+            width: 100%;
+        }
+
         .font-wedding { font-family: 'Great Vibes', cursive; }
         .font-header { font-family: 'Cinzel Decorative', serif; }
         .font-arabic { font-family: 'Noto Sans Arabic', sans-serif; }
-        .bg-pattern { background-image: url('https://www.transparenttextures.com/patterns/batik-fractal.png'); opacity: 0.08; position: fixed; inset: 0; pointer-events: none; }
+        
+        .bg-pattern { 
+            background-image: url('https://www.transparenttextures.com/patterns/batik-fractal.png'); 
+            opacity: 0.08; 
+            position: fixed; 
+            inset: 0; 
+            pointer-events: none; 
+            z-index: 1;
+        }
 
+        /* Mobile Responsive Frame */
         .frame-modern {
             position: relative;
-            width: 220px;
-            height: 320px;
+            width: 80vw;
+            max-width: 250px;
+            aspect-ratio: 2/3;
             margin: 0 auto;
-            border-radius: 110px 110px 0 0;
+            border-radius: 125px 125px 0 0;
             overflow: hidden;
             border: 3px solid var(--yellow-flat);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
@@ -130,35 +160,38 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(6, 64, 57, 0.9);
+            background: rgba(6, 64, 57, 0.95);
             backdrop-filter: blur(10px);
             border: 1px solid var(--yellow-flat);
-            padding: 8px 20px;
+            padding: 10px 25px;
             border-radius: 50px;
             z-index: 1000;
             display: flex;
-            gap: 15px;
+            gap: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
         }
 
-        .nav-item { color: rgba(255, 255, 0, 0.3); font-size: 0.9rem; transition: all 0.3s; }
-        .nav-item.active { color: var(--yellow-flat); transform: scale(1.1); }
+        .nav-item { color: rgba(255, 255, 0, 0.4); font-size: 1.1rem; transition: all 0.3s; }
+        .nav-item.active { color: var(--yellow-flat); transform: scale(1.2); }
 
         .btn-open {
             background: var(--yellow-flat);
             color: #064039;
-            padding: 12px 30px;
+            padding: 14px 40px;
             border-radius: 50px;
             font-weight: 800;
             text-transform: uppercase;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(255, 255, 0, 0.3);
         }
 
         .card-glass {
             background: var(--emerald-card);
-            border: 1px solid var(--yellow-flat);
+            border: 1px solid rgba(255, 255, 0, 0.3);
             border-radius: 20px;
-            padding: 25px 15px;
+            padding: 25px 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
         /* Improved Love Story Timeline Styles */
@@ -173,220 +206,245 @@
             transform: translateX(-50%);
             top: 0;
             bottom: 0;
-            width: 2px;
+            width: 1px;
             background: linear-gradient(to bottom, transparent, var(--yellow-flat), transparent);
-            opacity: 0.3;
+            opacity: 0.4;
         }
         .story-card {
-            background: rgba(11, 94, 82, 0.6);
+            background: rgba(11, 94, 82, 0.7);
             border: 1px solid rgba(255, 255, 0, 0.2);
-            backdrop-filter: blur(5px);
-            padding: 20px;
+            backdrop-filter: blur(8px);
+            padding: 25px 15px;
             border-radius: 20px;
             position: relative;
-            margin-bottom: 40px;
-            transition: all 0.3s ease;
-        }
-        .story-card:hover {
-            border-color: var(--yellow-flat);
-            transform: translateY(-5px);
+            margin-bottom: 50px;
+            width: 100%;
         }
         .story-icon {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             background: var(--yellow-flat);
             color: var(--emerald-bg);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: -40px auto 15px auto;
-            box-shadow: 0 0 15px var(--yellow-flat);
-            font-size: 1rem;
+            margin: -45px auto 15px auto;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.4);
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 2;
         }
 
         .cd-box {
             background: rgba(255, 255, 0, 0.1);
             border: 1px solid var(--yellow-flat);
             border-radius: 12px;
-            padding: 10px;
-            min-width: 60px;
+            padding: 8px;
+            flex: 1;
+            max-width: 70px;
         }
 
         .gallery-container {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: repeat(2, 120px);
-            gap: 8px;
+            grid-template-rows: repeat(2, 110px);
+            gap: 10px;
         }
-
         .gallery-item {
             position: relative;
             overflow: hidden;
-            border-radius: 8px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 0, 0.3);
         }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.7s ease;
-        }
-
-        .gallery-item:hover img {
-            transform: scale(1.15);
-        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
 
         .item-1 { grid-column: span 3; grid-row: span 2; }
         .item-2 { grid-column: span 3; grid-row: span 1; }
         .item-3 { grid-column: span 3; grid-row: span 1; }
 
         .btn-copy {
-            background: rgba(255, 255, 0, 0.1);
+            background: rgba(255, 255, 0, 0.15);
             border: 1px solid var(--yellow-flat);
             color: var(--yellow-flat);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 8px;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 10px;
             text-transform: uppercase;
             font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
         }
 
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-thumb { background: var(--yellow-flat); }
+        /* Animation for smooth page opening */
+        #main-content { opacity: 0; transition: opacity 1s ease-in; }
+        #main-content.visible { opacity: 1; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--yellow-flat); border-radius: 10px; }
     </style>
 </head>
-<body>
+<body class="antialiased">
 
     <div class="bg-pattern"></div>
-    <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <audio id="bgMusic" loop preload="auto"><source src="music.mp3" type="audio/mpeg"></audio>
 
-    <!-- Gatekeeper -->
-    <div id="gatekeeper" class="fixed inset-0 z-[2000] bg-[#064039] flex flex-col items-center justify-center transition-all duration-[1.5s]">
-        <div class="text-center px-6 relative z-20" data-aos="zoom-in">
-            <p class="font-header tracking-[0.6em] text-[8px] mb-4 text-white/80">THE WEDDING OF</p>
-            <h1 class="font-wedding text-6xl text-yellow-flat mb-8">Fara & Juan</h1>
-            <div class="mb-10">
-                <p class="text-[8px] text-white/50 mb-3 uppercase tracking-[0.4em]">Kepada Yth:</p>
-                <div class="inline-block border-y border-yellow-flat py-4 px-8 bg-white/5">
-                    <h2 class="text-lg font-header text-white" id="guestNameTag">Tamu Undangan</h2>
+    <!-- Gatekeeper / Landing Screen -->
+    <div id="gatekeeper" class="fixed inset-0 z-[2000] bg-[#064039] flex flex-col items-center justify-center transition-all duration-[1s] ease-in-out">
+        <div class="text-center px-8 relative z-20" data-aos="zoom-in">
+            <p class="font-header tracking-[0.5em] text-[10px] mb-4 text-white/80">THE WEDDING OF</p>
+            <h1 class="font-wedding text-7xl text-yellow-flat mb-8">Fara & Juan</h1>
+            
+            <div class="mb-12">
+                <p class="text-[9px] text-white/60 mb-3 uppercase tracking-[0.4em]">Spesial Untuk:</p>
+                <div class="inline-block border-y border-yellow-flat/50 py-5 px-10 bg-white/5 backdrop-blur-sm rounded-lg">
+                    <h2 class="text-xl font-header text-white" id="guestNameTag">Tamu Undangan</h2>
                 </div>
             </div>
-            <button onclick="openInvitation()" class="btn-open">Buka Undangan</button>
+            
+            <button onclick="openInvitation()" class="btn-open active:scale-95 transition-transform">Buka Undangan</button>
         </div>
+        <!-- Decorative elements on gatekeeper -->
+        <div class="absolute top-0 left-0 w-32 h-32 opacity-20 border-l border-t border-yellow-flat m-4"></div>
+        <div class="absolute bottom-0 right-0 w-32 h-32 opacity-20 border-r border-b border-yellow-flat m-4"></div>
     </div>
 
-    <!-- Music Control -->
-    <div id="musicToggle" onclick="toggleMusic()" class="fixed top-4 right-4 z-[1500] bg-emerald-950/90 p-2 rounded-full border border-yellow-flat cursor-pointer">
-        <i class="fas fa-compact-disc fa-spin text-yellow-flat text-sm"></i>
+    <!-- Music Control Floating Button -->
+    <div id="musicToggle" onclick="toggleMusic()" class="fixed top-5 right-5 z-[1500] bg-[#064039]/90 p-3 rounded-full border border-yellow-flat shadow-lg cursor-pointer flex items-center justify-center transition-transform hover:scale-110 active:scale-90">
+        <i class="fas fa-compact-disc fa-spin text-yellow-flat text-lg"></i>
     </div>
 
-    <div id="main-content">
+    <div id="main-content" class="relative z-10 overflow-hidden">
         
         <!-- Hero Section -->
-        <section id="home" class="min-h-screen flex flex-col justify-center items-center text-center px-6 pt-16">
+        <section id="home" class="min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20 pb-10">
             <div data-aos="fade-up">
-                <p class="font-header text-[8px] tracking-[0.5em] text-white/60 mb-8 uppercase">Salam Sejahtera Untuk Kita Semua</p>
-                <div class="flex items-center justify-center gap-3 mb-6">
-                    <div class="h-[1px] w-8 bg-yellow-flat"></div>
-                    <p class="font-header text-[9px] tracking-[0.5em] text-yellow-flat">30 . 03 . 30</p>
-                    <div class="h-[1px] w-8 bg-yellow-flat"></div>
-                </div>
-                <div class="frame-modern mb-8">
-                    <img src="foto (1).jpg" class="w-full h-full object-cover">
-                </div>
-                <h1 class="font-wedding text-6xl text-yellow-flat mb-4">Fara & Juan</h1>
+                <p class="font-header text-[9px] tracking-[0.4em] text-white/70 mb-8 uppercase">Kami Mengundang Anda</p>
                 
-                <!-- Countdown -->
-                <div id="countdown" class="flex justify-center gap-3 mb-8">
-                    <div class="cd-box"><span id="days" class="block font-header text-lg text-yellow-flat font-bold">00</span><span class="text-[7px] text-white/60 uppercase tracking-widest">Hari</span></div>
-                    <div class="cd-box"><span id="hours" class="block font-header text-lg text-yellow-flat font-bold">00</span><span class="text-[7px] text-white/60 uppercase tracking-widest">Jam</span></div>
-                    <div class="cd-box"><span id="minutes" class="block font-header text-lg text-yellow-flat font-bold">00</span><span class="text-[7px] text-white/60 uppercase tracking-widest">Menit</span></div>
-                    <div class="cd-box"><span id="seconds" class="block font-header text-lg text-yellow-flat font-bold">00</span><span class="text-[7px] text-white/60 uppercase tracking-widest">Detik</span></div>
+                <div class="flex items-center justify-center gap-4 mb-8">
+                    <div class="h-[1px] w-12 bg-yellow-flat"></div>
+                    <p class="font-header text-[12px] tracking-[0.4em] text-yellow-flat font-bold">30 . 03 . 30</p>
+                    <div class="h-[1px] w-12 bg-yellow-flat"></div>
                 </div>
 
-                <div class="max-w-xs mx-auto mb-10">
-                    <p class="text-[10px] italic text-white/70 leading-relaxed">"Cinta tidak terlihat dengan mata, melainkan dengan hati. Dan dalam persatuan ini, kami menemukan rumah untuk selamanya."</p>
+                <div class="frame-modern mb-8">
+                    <img src="foto (1).jpg" class="w-full h-full object-cover" alt="Mempelai">
+                </div>
+
+                <h1 class="font-wedding text-6xl text-yellow-flat mb-4 drop-shadow-md">Fara & Juan</h1>
+                
+                <!-- Countdown -->
+                <div id="countdown" class="flex justify-center gap-2 mb-10 px-2">
+                    <div class="cd-box"><span id="days" class="block font-header text-xl text-yellow-flat font-bold">00</span><span class="text-[8px] text-white/50 uppercase tracking-widest">Hari</span></div>
+                    <div class="cd-box"><span id="hours" class="block font-header text-xl text-yellow-flat font-bold">00</span><span class="text-[8px] text-white/50 uppercase tracking-widest">Jam</span></div>
+                    <div class="cd-box"><span id="minutes" class="block font-header text-xl text-yellow-flat font-bold">00</span><span class="text-[8px] text-white/50 uppercase tracking-widest">Mnt</span></div>
+                    <div class="cd-box"><span id="seconds" class="block font-header text-xl text-yellow-flat font-bold">00</span><span class="text-[8px] text-white/50 uppercase tracking-widest">Dtk</span></div>
+                </div>
+
+                <div class="max-w-xs mx-auto mb-10 px-4">
+                    <p class="text-[12px] italic text-white/70 leading-relaxed font-light">
+                        "Cinta tidak terlihat dengan mata, melainkan dengan hati. Dan dalam persatuan ini, kami menemukan rumah untuk selamanya."
+                    </p>
+                </div>
+                
+                <div class="animate-bounce mt-4 opacity-50">
+                    <i class="fas fa-chevron-down text-yellow-flat"></i>
                 </div>
             </div>
         </section>
 
         <!-- Opening Text -->
-        <section class="py-16 px-8 text-center" data-aos="fade-up">
-            <div class="max-w-md mx-auto">
-                <p class="text-[11px] mb-8 leading-relaxed font-light">
+        <section class="py-20 px-8 text-center" data-aos="fade-up">
+            <div class="max-w-sm mx-auto">
+                <p class="text-[13px] mb-10 leading-relaxed font-light text-white/90">
                     Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan. Ya Allah, perkenankanlah kami merangkai kasih sayang yang Kau ciptakan dalam sebuah ikatan pernikahan:
                 </p>
-                <div class="font-arabic text-2xl mb-4 text-yellow-flat">وَمِنْ ءَايَٰتِهِۦٓ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَٰجًا</div>
-                <p class="text-[10px] italic text-white/70 mb-4 px-4 leading-relaxed">"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan-pasangan dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya."</p>
-                <p class="font-header text-[8px] text-yellow-flat tracking-[0.3em] font-bold uppercase">( QS. AR-RUM : 21 )</p>
+                <div class="font-arabic text-3xl mb-6 text-yellow-flat leading-loose">وَمِنْ ءَايَٰتِهِۦٓ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَٰجًا</div>
+                <p class="text-[12px] italic text-white/70 mb-4 px-2 leading-relaxed">
+                    "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu pasangan-pasangan dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya."
+                </p>
+                <p class="font-header text-[10px] text-yellow-flat tracking-[0.3em] font-bold uppercase mt-6">( QS. AR-RUM : 21 )</p>
             </div>
         </section>
 
         <!-- Mempelai -->
-        <section id="couple" class="py-16 px-6">
+        <section id="couple" class="py-20 px-6">
             <div class="max-w-md mx-auto">
-                <h2 class="text-center font-header text-sm tracking-[0.4em] text-yellow-flat mb-12 uppercase">Mempelai</h2>
-                <div class="grid grid-cols-2 gap-4 items-start border-b border-yellow-flat/20 pb-16">
-                    <div class="text-center" data-aos="fade-right">
-                        <div class="w-24 h-24 mx-auto p-1 border-2 border-yellow-flat rounded-full mb-4">
-                            <img src="foto (2).jpg" class="w-full h-full object-cover rounded-full">
+                <h2 class="text-center font-header text-[12px] tracking-[0.5em] text-yellow-flat mb-16 uppercase font-bold">Mempelai</h2>
+                
+                <div class="space-y-20">
+                    <!-- Mempelai Wanita -->
+                    <div class="text-center" data-aos="fade-up">
+                        <div class="relative inline-block mb-8">
+                            <div class="w-40 h-40 mx-auto p-1.5 border-2 border-yellow-flat rounded-full">
+                                <img src="foto (2).jpg" class="w-full h-full object-cover rounded-full shadow-2xl">
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 bg-yellow-flat text-emerald-bg p-2 rounded-full shadow-lg">
+                                <i class="fab fa-instagram"></i>
+                            </div>
                         </div>
-                        <h3 class="font-wedding text-2xl text-yellow-flat mb-2">Fara</h3>
-                        <p class="text-[7px] font-bold text-white tracking-widest mb-1 uppercase">Putri Dari</p>
-                        <p class="text-[8px] text-white/50 mb-3">Bpk Sudarsono & Ibu Sumiati</p>
-                        <a href="#" class="text-yellow-flat text-[10px] opacity-70"><i class="fab fa-instagram"></i> @fara_anindya</a>
+                        <h3 class="font-wedding text-4xl text-yellow-flat mb-3">Fara Anindya</h3>
+                        <p class="text-[10px] font-bold text-white tracking-[0.3em] mb-2 uppercase">Putri Tercinta Dari</p>
+                        <p class="text-[11px] text-white/60 mb-4">Bpk Sudarsono & Ibu Sumiati</p>
+                        <a href="#" class="inline-block text-yellow-flat text-[12px] font-semibold">@fara_anindya</a>
                     </div>
-                    <div class="text-center" data-aos="fade-left">
-                        <div class="w-24 h-24 mx-auto p-1 border-2 border-yellow-flat rounded-full mb-4">
-                            <img src="foto (7).jpg" class="w-full h-full object-cover rounded-full">
+
+                    <!-- Divider -->
+                    <div class="flex items-center justify-center gap-6" data-aos="zoom-in">
+                        <div class="h-[1px] flex-1 bg-yellow-flat/30"></div>
+                        <span class="font-wedding text-5xl text-yellow-flat">&</span>
+                        <div class="h-[1px] flex-1 bg-yellow-flat/30"></div>
+                    </div>
+
+                    <!-- Mempelai Pria -->
+                    <div class="text-center" data-aos="fade-up">
+                        <div class="relative inline-block mb-8">
+                            <div class="w-40 h-40 mx-auto p-1.5 border-2 border-yellow-flat rounded-full">
+                                <img src="foto (7).jpg" class="w-full h-full object-cover rounded-full shadow-2xl">
+                            </div>
+                            <div class="absolute -bottom-2 -right-2 bg-yellow-flat text-emerald-bg p-2 rounded-full shadow-lg">
+                                <i class="fab fa-instagram"></i>
+                            </div>
                         </div>
-                        <h3 class="font-wedding text-2xl text-yellow-flat mb-2">Juan</h3>
-                        <p class="text-[7px] font-bold text-white tracking-widest mb-1 uppercase">Putra Dari</p>
-                        <p class="text-[8px] text-white/50 mb-3">Bpk Handoko & Ibu Larasati</p>
-                        <a href="#" class="text-yellow-flat text-[10px] opacity-70"><i class="fab fa-instagram"></i> @juan_arkana</a>
+                        <h3 class="font-wedding text-4xl text-yellow-flat mb-3">Juan Arkana</h3>
+                        <p class="text-[10px] font-bold text-white tracking-[0.3em] mb-2 uppercase">Putra Tercinta Dari</p>
+                        <p class="text-[11px] text-white/60 mb-4">Bpk Handoko & Ibu Larasati</p>
+                        <a href="#" class="inline-block text-yellow-flat text-[12px] font-semibold">@juan_arkana</a>
                     </div>
                 </div>
 
                 <!-- Improved Love Story Section -->
-                <div id="story" class="mt-16 text-center">
-                    <h2 class="font-header text-sm tracking-[0.4em] text-yellow-flat mb-20 uppercase">Our Love Journey</h2>
+                <div id="story" class="mt-32 text-center">
+                    <h2 class="font-header text-[12px] tracking-[0.4em] text-yellow-flat mb-20 uppercase font-bold">Our Love Journey</h2>
                     
-                    <div class="story-timeline max-w-sm mx-auto">
+                    <div class="story-timeline max-w-xs mx-auto">
                         <!-- Card 1 -->
                         <div class="story-card" data-aos="fade-up">
-                            <div class="story-icon">
-                                <i class="fas fa-eye"></i>
-                            </div>
-                            <h4 class="font-header text-[10px] text-yellow-flat tracking-widest mb-1 uppercase">Awal Perjumpaan</h4>
-                            <p class="text-[7px] text-white/40 mb-3 uppercase tracking-widest">Januari 2025</p>
-                            <p class="text-[10px] leading-relaxed text-white/70 italic px-2">
-                                Berawal dari pertemuan tak sengaja di perpustakaan kota, tatapan mata yang singkat namun membekas di hati menjadi benih rasa yang kami semai bersama.
+                            <div class="story-icon"><i class="fas fa-eye"></i></div>
+                            <h4 class="font-header text-[11px] text-yellow-flat tracking-widest mb-1 uppercase">Pertama Kali Bertemu</h4>
+                            <p class="text-[9px] text-white/40 mb-4 uppercase tracking-widest">Januari 2025</p>
+                            <p class="text-[12px] leading-relaxed text-white/80 italic px-2">
+                                Berawal dari pertemuan tak sengaja di perpustakaan kota, tatapan mata yang singkat namun membekas di hati.
                             </p>
                         </div>
 
                         <!-- Card 2 -->
-                        <div class="story-card" data-aos="fade-up" data-aos-delay="200">
-                            <div class="story-icon">
-                                <i class="fas fa-handshake"></i>
-                            </div>
-                            <h4 class="font-header text-[10px] text-yellow-flat tracking-widest mb-1 uppercase">Satu Tujuan</h4>
-                            <p class="text-[7px] text-white/40 mb-3 uppercase tracking-widest">Agustus 2027</p>
-                            <p class="text-[10px] leading-relaxed text-white/70 italic px-2">
-                                Ribuan hari berlalu, kami menyadari bahwa perbedaan bukanlah penghalang, melainkan warna yang melengkapi. Kami memutuskan untuk saling menjaga dalam komitmen yang suci.
+                        <div class="story-card" data-aos="fade-up">
+                            <div class="story-icon"><i class="fas fa-heart"></i></div>
+                            <h4 class="font-header text-[11px] text-yellow-flat tracking-widest mb-1 uppercase">Menjalin Kasih</h4>
+                            <p class="text-[9px] text-white/40 mb-4 uppercase tracking-widest">Agustus 2027</p>
+                            <p class="text-[12px] leading-relaxed text-white/80 italic px-2">
+                                Ribuan hari berlalu, kami menyadari bahwa perbedaan bukanlah penghalang, melainkan warna yang melengkapi.
                             </p>
                         </div>
 
                         <!-- Card 3 -->
-                        <div class="story-card" data-aos="fade-up" data-aos-delay="400">
-                            <div class="story-icon">
-                                <i class="fas fa-ring"></i>
-                            </div>
-                            <h4 class="font-header text-[10px] text-yellow-flat tracking-widest mb-1 uppercase">Ikatan Suci</h4>
-                            <p class="text-[7px] text-white/40 mb-3 uppercase tracking-widest">Desember 2029</p>
-                            <p class="text-[10px] leading-relaxed text-white/70 italic px-2">
-                                Melangkah ke gerbang keseriusan yang lebih tinggi, kami mengikrarkan janji di hadapan orang tua untuk menyatukan dua keluarga menjadi satu kesatuan yang utuh.
+                        <div class="story-card" data-aos="fade-up">
+                            <div class="story-icon"><i class="fas fa-ring"></i></div>
+                            <h4 class="font-header text-[11px] text-yellow-flat tracking-widest mb-1 uppercase">Janji Suci</h4>
+                            <p class="text-[9px] text-white/40 mb-4 uppercase tracking-widest">Maret 2030</p>
+                            <p class="text-[12px] leading-relaxed text-white/80 italic px-2">
+                                Melangkah ke gerbang keseriusan, kami mengikrarkan janji untuk menyatukan dua keluarga menjadi satu kesatuan.
                             </p>
                         </div>
                     </div>
@@ -395,102 +453,124 @@
         </section>
 
         <!-- Gallery Section -->
-        <section id="gallery" class="py-16 px-6 bg-black/5">
+        <section id="gallery" class="py-20 px-6 bg-black/10">
             <div class="max-w-md mx-auto">
-                <h2 class="text-center font-header text-sm tracking-[0.4em] text-yellow-flat mb-10 uppercase">Our Moments</h2>
+                <h2 class="text-center font-header text-[12px] tracking-[0.5em] text-yellow-flat mb-12 uppercase font-bold">Our Moments</h2>
                 <div class="gallery-container">
                     <div class="gallery-item item-1" data-aos="zoom-in">
-                        <img src="foto (3).jpg">
+                        <img src="foto (3).jpg" loading="lazy">
                     </div>
                     <div class="gallery-item item-2" data-aos="fade-left">
-                        <img src="foto (4).jpg">
+                        <img src="foto (4).jpg" loading="lazy">
                     </div>
                     <div class="gallery-item item-3" data-aos="fade-left" data-aos-delay="200">
-                        <img src="foto (5).jpg">
+                        <img src="foto (5).jpg" loading="lazy">
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2 mt-2">
-                    <div class="gallery-item h-[150px]" data-aos="fade-up">
-                        <img src="foto (6).jpg">
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    <div class="gallery-item h-[140px]" data-aos="fade-up">
+                        <img src="foto (6).jpg" loading="lazy">
                     </div>
-                    <div class="gallery-item h-[150px]" data-aos="fade-up" data-aos-delay="100">
-                        <img src="foto (1).jpg">
+                    <div class="gallery-item h-[140px]" data-aos="fade-up" data-aos-delay="100">
+                        <img src="foto (1).jpg" loading="lazy">
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Event Info -->
-        <section id="event" class="py-16 px-6">
+        <section id="event" class="py-20 px-6">
             <div class="max-w-md mx-auto">
-                <h2 class="text-center font-header text-sm tracking-[0.4em] text-yellow-flat mb-8 uppercase">Informasi Acara</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <h2 class="text-center font-header text-[12px] tracking-[0.5em] text-yellow-flat mb-12 uppercase font-bold">Informasi Acara</h2>
+                
+                <div class="space-y-6">
                     <div class="card-glass text-center" data-aos="zoom-in">
-                        <h3 class="font-header text-[10px] text-yellow-flat mb-4 uppercase tracking-widest border-b border-yellow-flat/20 pb-2">Akad Nikah</h3>
-                        <p class="text-[10px] font-bold mb-1 uppercase tracking-widest">Sabtu, 30 Maret 2030</p>
-                        <p class="text-[9px] mb-4">Pukul 08:00 - 10:00 WIB</p>
+                        <div class="mb-4 text-yellow-flat opacity-30 text-3xl">
+                            <i class="fas fa-church"></i>
+                        </div>
+                        <h3 class="font-header text-[12px] text-yellow-flat mb-4 uppercase tracking-widest border-b border-yellow-flat/20 pb-3">Akad Nikah</h3>
+                        <p class="text-[12px] font-bold mb-2 uppercase tracking-widest">Sabtu, 30 Maret 2030</p>
+                        <p class="text-[11px] mb-4 text-white/80">Pukul 08:00 - 10:00 WIB</p>
                     </div>
+
                     <div class="card-glass text-center" data-aos="zoom-in" data-aos-delay="200">
-                        <h3 class="font-header text-[10px] text-yellow-flat mb-4 uppercase tracking-widest border-b border-yellow-flat/20 pb-2">Resepsi</h3>
-                        <p class="text-[10px] font-bold mb-1 uppercase tracking-widest">Sabtu, 30 Maret 2030</p>
-                        <p class="text-[9px] mb-4">Pukul 11:00 - Selesai</p>
+                        <div class="mb-4 text-yellow-flat opacity-30 text-3xl">
+                            <i class="fas fa-glass-cheers"></i>
+                        </div>
+                        <h3 class="font-header text-[12px] text-yellow-flat mb-4 uppercase tracking-widest border-b border-yellow-flat/20 pb-3">Resepsi</h3>
+                        <p class="text-[12px] font-bold mb-2 uppercase tracking-widest">Sabtu, 30 Maret 2030</p>
+                        <p class="text-[11px] mb-4 text-white/80">Pukul 11:00 - Selesai</p>
                     </div>
                 </div>
-                <div class="mt-8 text-center" data-aos="fade-up">
-                    <p class="text-[10px] text-white/80 font-bold mb-1 uppercase">Hotel Mulia Senayan</p>
-                    <p class="text-[9px] text-white/60 mb-6 px-10">Jl. Asia Afrika, Gelora, Kecamatan Tanah Abang, Jakarta Pusat</p>
-                    <button class="px-8 py-3 border border-yellow-flat text-yellow-flat rounded-full text-[8px] font-bold uppercase tracking-widest hover:bg-yellow-flat hover:text-emerald-950 transition-all">Buka Google Maps</button>
+
+                <div class="mt-12 text-center card-glass" data-aos="fade-up">
+                    <i class="fas fa-map-marker-alt text-yellow-flat text-2xl mb-4"></i>
+                    <p class="text-[12px] text-white font-bold mb-2 uppercase tracking-widest">Hotel Mulia Senayan</p>
+                    <p class="text-[10px] text-white/60 mb-8 px-4 leading-relaxed italic">Jl. Asia Afrika, Gelora, Kecamatan Tanah Abang, Jakarta Pusat</p>
+                    <a href="https://maps.app.goo.gl/hotelmuliasenayan" target="_blank" class="inline-block px-10 py-4 bg-yellow-flat text-emerald-bg rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg hover:brightness-110 active:scale-95 transition-all">
+                        <i class="fas fa-location-arrow mr-2"></i> Buka Google Maps
+                    </a>
                 </div>
             </div>
         </section>
 
         <!-- Gift -->
-        <section id="gift" class="py-16 px-6">
+        <section id="gift" class="py-20 px-6">
             <div class="max-w-md mx-auto text-center">
-                <h2 class="font-header text-sm tracking-[0.4em] text-yellow-flat mb-6 uppercase">Wedding Gift</h2>
-                <div class="space-y-4">
-                    <div class="card-glass p-6" data-aos="flip-up">
-                        <p class="text-[10px] font-bold text-white tracking-widest uppercase mb-1">Bank BCA</p>
-                        <p id="accNum1" class="text-yellow-flat font-header text-lg font-bold mb-1">1234 567 890</p>
-                        <button onclick="copyAccount('accNum1')" class="btn-copy">Salin No. Rekening</button>
-                    </div>
+                <h2 class="font-header text-[12px] tracking-[0.5em] text-yellow-flat mb-10 uppercase font-bold">Kado Digital</h2>
+                <div class="card-glass p-8" data-aos="flip-up">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" class="h-6 mx-auto mb-6 brightness-0 invert" alt="BCA">
+                    <p class="text-[10px] font-bold text-white/60 tracking-[0.3em] uppercase mb-2">Nomor Rekening BCA</p>
+                    <p id="accNum1" class="text-yellow-flat font-header text-2xl font-bold mb-4">1234 567 890</p>
+                    <p class="text-[11px] text-white mb-6 uppercase tracking-widest">A/N Fara Anindya</p>
+                    <button onclick="copyAccount('accNum1')" class="btn-copy active:bg-yellow-flat active:text-emerald-bg">
+                        <i class="fas fa-copy mr-2"></i> Salin Nomor
+                    </button>
                 </div>
             </div>
         </section>
 
         <!-- Wishes -->
-        <section id="wishes" class="py-16 px-8 bg-black/10">
+        <section id="wishes" class="py-20 px-6 bg-black/20">
             <div class="max-w-sm mx-auto">
-                <h2 class="text-center font-header text-sm text-yellow-flat mb-8 tracking-[0.4em] uppercase">Ucapan & Doa</h2>
-                <form id="greetingForm" class="space-y-3">
-                    <input type="text" id="guestName" placeholder="NAMA LENGKAP" required class="w-full bg-black/30 border border-yellow-flat/20 rounded-xl px-4 py-3 text-[9px] text-white outline-none">
-                    <textarea id="guestMessage" placeholder="TULIS UCAPAN..." required rows="3" class="w-full bg-black/30 border border-yellow-flat/20 rounded-xl px-4 py-3 text-[9px] text-white outline-none"></textarea>
-                    <div class="grid grid-cols-1 gap-3">
-                        <button type="button" onclick="sendToWA()" class="bg-[#25D366] text-white py-3 rounded-xl text-[10px] font-bold uppercase flex items-center justify-center gap-2">
-                            <i class="fab fa-whatsapp"></i> Kirim Via WhatsApp
+                <h2 class="text-center font-header text-[12px] text-yellow-flat mb-10 tracking-[0.5em] uppercase font-bold">Ucapan & Doa</h2>
+                <form id="greetingForm" class="space-y-4">
+                    <input type="text" id="guestName" placeholder="NAMA LENGKAP" required class="w-full bg-white/5 border border-yellow-flat/30 rounded-xl px-5 py-4 text-[11px] text-white outline-none focus:border-yellow-flat transition-colors">
+                    <textarea id="guestMessage" placeholder="TULIS UCAPAN & DOA RESTU..." required rows="4" class="w-full bg-white/5 border border-yellow-flat/30 rounded-xl px-5 py-4 text-[11px] text-white outline-none focus:border-yellow-flat transition-colors"></textarea>
+                    
+                    <div class="grid grid-cols-1 gap-4 pt-2">
+                        <button type="submit" class="bg-yellow-flat text-emerald-950 py-4 rounded-xl text-[11px] font-black uppercase shadow-lg active:scale-95 transition-transform">
+                            Kirim Ucapan
                         </button>
-                        <button type="submit" class="bg-yellow-flat text-emerald-950 py-3 rounded-xl text-[10px] font-bold uppercase">Simpan di Website</button>
+                        <button type="button" onclick="sendToWA()" class="bg-[#25D366] text-white py-4 rounded-xl text-[11px] font-black uppercase flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg">
+                            <i class="fab fa-whatsapp text-lg"></i> Konfirmasi via WA
+                        </button>
                     </div>
-                    <p id="statusMsg" class="text-center text-[9px] text-yellow-flat mt-2 hidden"></p>
+                    <p id="statusMsg" class="text-center text-[10px] text-yellow-flat mt-4 hidden font-bold"></p>
                 </form>
-                <div id="greetingsList" class="mt-8 max-h-[300px] overflow-y-auto pr-2"></div>
+
+                <div id="greetingsList" class="mt-12 max-h-[400px] overflow-y-auto pr-2 custom-scroll">
+                    <!-- Greetings items injected here -->
+                </div>
             </div>
         </section>
 
         <!-- Closing -->
-        <section class="py-24 px-8 text-center" data-aos="fade-up">
-            <div class="max-w-md mx-auto">
-                <p class="text-[11px] leading-relaxed mb-10 font-light">
+        <section class="py-32 px-8 text-center" data-aos="fade-up">
+            <div class="max-w-sm mx-auto">
+                <p class="text-[14px] leading-relaxed mb-12 font-light text-white/80">
                     Merupakan suatu kehormatan bagi kami apabila Bapak/Ibu berkenan hadir untuk memberikan doa restu kepada kami.
                 </p>
-                <h1 class="font-wedding text-5xl text-yellow-flat mb-6">Fara & Juan</h1>
-                <p class="text-[8px] text-white/40 tracking-[0.2em] uppercase">Sampai Jumpa di Hari Bahagia Kami</p>
+                <p class="text-[10px] tracking-[0.3em] uppercase mb-8 text-white/50">Kami yang berbahagia,</p>
+                <h1 class="font-wedding text-6xl text-yellow-flat mb-10 drop-shadow-lg">Fara & Juan</h1>
+                <div class="h-[1px] w-20 bg-yellow-flat mx-auto mb-10 opacity-30"></div>
+                <p class="text-[9px] text-white/30 tracking-[0.5em] uppercase">Created with Love • 2030</p>
             </div>
         </section>
 
     </div>
 
-    <!-- Nav -->
+    <!-- Mobile Navigation Bar -->
     <nav class="floating-nav">
         <a href="#home" class="nav-item active"><i class="fas fa-home"></i></a>
         <a href="#couple" class="nav-item"><i class="fas fa-heart"></i></a>
@@ -501,53 +581,97 @@
     </nav>
 
     <script>
-        AOS.init({ once: true, duration: 1000 });
+        // Initialize AOS
+        AOS.init({ 
+            once: true, 
+            duration: 1000,
+            offset: 100
+        });
 
+        // Guest Name from URL
         const urlParams = new URLSearchParams(window.location.search);
         const to = urlParams.get('to') || 'Tamu Undangan';
         document.getElementById('guestNameTag').innerText = to;
 
+        // Open Invitation
         function openInvitation() {
             const gate = document.getElementById('gatekeeper');
+            const main = document.getElementById('main-content');
+            const music = document.getElementById('bgMusic');
+            
             gate.style.opacity = '0';
             gate.style.transform = 'translateY(-100%)';
-            document.getElementById('bgMusic').play().catch(e => {});
+            
+            music.play().catch(e => {
+                console.log("Autoplay blocked, waiting for interaction");
+            });
+
             setTimeout(() => { 
                 gate.style.display = 'none';
+                main.classList.add('visible');
+                window.scrollTo(0,0);
                 AOS.refresh();
-            }, 1500);
+            }, 1000);
         }
 
+        // Music Toggle Logic
         let isPlaying = true;
         function toggleMusic() {
             const music = document.getElementById('bgMusic');
             const icon = document.querySelector('#musicToggle i');
-            if (isPlaying) { music.pause(); icon.classList.remove('fa-spin'); icon.classList.replace('fa-compact-disc', 'fa-play'); }
-            else { music.play(); icon.classList.add('fa-spin'); icon.classList.replace('fa-play', 'fa-compact-disc'); }
+            if (isPlaying) { 
+                music.pause(); 
+                icon.classList.remove('fa-spin'); 
+                icon.classList.replace('fa-compact-disc', 'fa-play'); 
+            } else { 
+                music.play(); 
+                icon.classList.add('fa-spin'); 
+                icon.classList.replace('fa-play', 'fa-compact-disc'); 
+            }
             isPlaying = !isPlaying;
         }
 
-        const target = new Date("March 30, 2030 08:00:00").getTime();
-        setInterval(() => {
+        // Countdown Timer Logic
+        const targetDate = new Date("March 30, 2030 08:00:00").getTime();
+        const countdownTimer = setInterval(() => {
             const now = new Date().getTime();
-            const diff = target - now;
-            if (diff <= 0) return;
-            document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-            document.getElementById('hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-            document.getElementById('minutes').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-            document.getElementById('seconds').innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+            const distance = targetDate - now;
+            
+            if (distance < 0) {
+                clearInterval(countdownTimer);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = days.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
         }, 1000);
 
+        // Active Nav Highlighter
         window.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('section');
             const navItems = document.querySelectorAll('.nav-item');
-            let curr = '';
-            sections.forEach(s => {
-                if (window.pageYOffset >= s.offsetTop - 450) curr = s.getAttribute('id');
+            let current = 'home';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
             });
-            navItems.forEach(i => {
-                i.classList.remove('active');
-                if (i.getAttribute('href').includes(curr)) i.classList.add('active');
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === `#${current}`) {
+                    item.classList.add('active');
+                }
             });
         });
     </script>
